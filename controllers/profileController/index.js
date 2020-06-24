@@ -6,7 +6,7 @@ const renameFile = util.promisify(fs.rename);
 const unlinkFile = util.promisify(fs.unlink);
 const jwt = require('jsonwebtoken');
 const formidable = require('formidable');
-const uploadDir = require('../../helpers/constants').uploadDir;
+const uploadDir = require('../../helpers/config').uploadDir;
 const bcrypt = require('bcrypt');
 
 module.exports.get = async (req, res) => {
@@ -130,7 +130,7 @@ function validationErrorHandler(error, res, avatar = null) {
     return res.status(400).json({ message: error });
 }
 
-function getUserFromToken(token) {
+async function getUserFromToken(token) {
     const decodedToken = jwt.decode(token);
     return await User.findOne({ where: { id: decodedToken.id }});
 }

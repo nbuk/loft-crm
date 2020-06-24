@@ -3,9 +3,13 @@ var createError = require('http-errors');
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var indexRouter = require('./routes/index');
+
+require('dotenv').config({
+    path: '.env',
+});
 
 var app = express();
+var indexRouter = require('./routes/index');
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -15,7 +19,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(indexRouter);
 
-app.get('/', (req, res) => {
+app.get('*', (req, res) => {
     res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
 });
 
