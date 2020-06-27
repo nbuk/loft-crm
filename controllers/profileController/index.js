@@ -16,7 +16,7 @@ module.exports.get = async (req, res) => {
 };
 
 module.exports.patch = async (req, res) => {
-    const user = await getUserFromToken(req.get('Authorization').split(' ')[1])
+    const user = await getUserFromToken(req.get('Authorization').split(' ')[1]);
     const form = formidable.IncomingForm({ uploadDir });
 
     form.parse(req, async (err, fields, files) => {
@@ -30,11 +30,19 @@ module.exports.patch = async (req, res) => {
 
         if (validFields.err) {
             console.log(err);
-            return validationErrorHandler(validFields.status, res, validAvatar.avatar);
+            return validationErrorHandler(
+                validFields.status,
+                res,
+                validAvatar.avatar,
+            );
         }
 
         if (validPassword.err) {
-            return validationErrorHandler(validPassword.status, res, validAvatar.avatar);
+            return validationErrorHandler(
+                validPassword.status,
+                res,
+                validAvatar.avatar,
+            );
         }
 
         if (validFields.status) {
@@ -43,48 +51,59 @@ module.exports.patch = async (req, res) => {
                 ...dataToUpdate,
                 firstName,
                 middleName,
-                surName
-            }
+                surName,
+            };
         }
 
         if (validPassword.status) {
             const newCryptedPassword = validPassword.newCryptedPassword;
             dataToUpdate = {
                 ...dataToUpdate,
-                password: newCryptedPassword
-            }
+                password: newCryptedPassword,
+            };
         }
 
         if (validAvatar.avatar) {
             const fileName = path.join(uploadDir, validAvatar.avatar.name);
-            try {
-                await renameFile(validAvatar.avatar.path, fileName)
-                const oldAvatarPath = path.join(process.cwd(), 'public', user.image);
 
-            if (!oldAvatarPath.includes('no-user-image-big.png')) {
-                unlinkFile(oldAvatarPath)
-                    .then(() => console.log('Old avatar removed'));
-            }
+            try {
+                const image = await Jimp.read(validAvatar.avatar.path);
+                image.scaleToFit(270, 270);
+                image.write(fileName);
+                unlinkFile(validAvatar.avatar.path);
+
+                const oldAvatarPath = path.join(
+                    process.cwd(),
+                    'public',
+                    user.image,
+                );
+
+                if (!oldAvatarPath.includes('no-user-image-big.png')) {
+                    unlinkFile(oldAvatarPath).then(() =>
+                        console.log('Old avatar removed')
+                    );
+                }
+
                 dataToUpdate = {
                     ...dataToUpdate,
-                    image: `assets/img/${validAvatar.avatar.name}`
-                }
+                    image: `assets/img/${validAvatar.avatar.name}`,
+                };
             } catch (err) {
                 console.error(err);
-                unlinkFile(validAvatar.avatar.path)
-                    .then(() => console.log('File removed'));
-            }   
+                unlinkFile(validAvatar.avatar.path);
+                res.status(500).json({ message: 'Ошибка сервера' });
+            }
         }
 
         try {
             await user.update(dataToUpdate);
         } catch (err) {
             console.error(err);
-            return res.status(500).json({ message: 'Ошибка сервера'});
+            return res.status(500).json({ message: 'Ошибка сервера' });
         }
 
         return res.status(200).json(getUserObject(user));
-    })
+    });
 };
 
 function validateFields(fields) {
@@ -107,25 +126,23 @@ async function validatePassword(fields, userPassword) {
 
         return { status: true, newCryptedPassword, err: false };
     } else {
-        return { err: false }
+        return { err: false };
     }
-    
 }
 
 function validateAvatar(files) {
     if (files.avatar) {
         const avatar = files.avatar;
-        return { avatar, err: false }
+        return { avatar, err: false };
     }
 
-    return { err: false }
+    return { err: false };
 }
 
 function validationErrorHandler(error, res, avatar = null) {
     console.error(error);
     if (avatar) {
-        unlinkFile(avatar.path)
-            .then(() => console.log('File removed'));
+        unlinkFile(avatar.path).then(() => console.log('File removed'));
     }
 
     return res.status(400).json({ message: error });
@@ -133,7 +150,7 @@ function validationErrorHandler(error, res, avatar = null) {
 
 async function getUserFromToken(token) {
     const decodedToken = jwt.decode(token);
-    return await User.findOne({ where: { id: decodedToken.id }});
+    return await User.findOne({ where: { id: decodedToken.id } });
 }
 
 function getUserObject(user) {
@@ -144,8 +161,6 @@ function getUserObject(user) {
         middleName: user.middleName,
         permission: user.permission,
         surName: user.surName,
-        username: user.username
-    }
+        username: user.username,
+    };
 }
-
-
