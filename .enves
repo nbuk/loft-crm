@@ -1,0 +1,10 @@
+DB_HOST=0.0.0.0
+DB_USER=postgres
+DB_PASS=admin
+DB_PORT=5432
+DB_NAME=postgres
+DB_URL=postgres://localhost:5432/postgres
+
+NODE_ENV=production
+
+JWT_SECRET_KEY=verysecretkey
