@@ -1,6 +1,5 @@
-const path = require('path');
 require('dotenv').config({
-  path: path.join(__dirname, '../.env')
+  path: '.env',
 });
 
 module.exports = {
@@ -9,13 +8,23 @@ module.exports = {
     "password": process.env.DB_PASS,
     "database": process.env.DB_NAME,
     "host": process.env.DB_HOST,
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "pool": {
+      "max": 10,
+      "min": 0,
+      "idle": 10000
+    }
   },
   "production": {
     "username": process.env.DB_USER,
     "password": process.env.DB_PASS,
     "database": process.env.DB_NAME,
     "host": process.env.DB_HOST,
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "pool": {
+      "max": 10,
+      "min": 0,
+      "idle": 10000
+    }
   }
 }
