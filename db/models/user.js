@@ -12,9 +12,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {});
   user.associate = function(models) {
-    // user.hasMany(models.news, {
-    //   foreignKey: 'userID'
-    // })
+    user.hasMany(models.chat, {
+      foreignKey: 'userId'
+    });
+    user.hasMany(models.chat, {
+      foreignKey: 'recipientId'
+    })
   };
   return user;
 };

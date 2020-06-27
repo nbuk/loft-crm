@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const formidable = require('formidable');
 const uploadDir = require('../../helpers/config').uploadDir;
 const bcrypt = require('bcrypt');
+const Jimp = require('jimp');
 
 module.exports.get = async (req, res) => {
     const user = await getUserFromToken(req.get('Authorization').split(' ')[1]);
@@ -60,10 +61,10 @@ module.exports.patch = async (req, res) => {
                 await renameFile(validAvatar.avatar.path, fileName)
                 const oldAvatarPath = path.join(process.cwd(), 'public', user.image);
 
-                if (!oldAvatarPath.includes('no-user-image-big.png')) {
-                    unlinkFile(oldAvatarPath)
-                        .then(() => console.log('Old avatar removed'));
-                }
+            if (!oldAvatarPath.includes('no-user-image-big.png')) {
+                unlinkFile(oldAvatarPath)
+                    .then(() => console.log('Old avatar removed'));
+            }
                 dataToUpdate = {
                     ...dataToUpdate,
                     image: `assets/img/${validAvatar.avatar.name}`

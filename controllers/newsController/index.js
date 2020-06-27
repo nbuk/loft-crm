@@ -13,8 +13,13 @@ module.exports.get = async (req, res) => {
 };
 
 module.exports.post = async (req, res) => {
-    const decodedToken = jwt.decode(req.headers.authorization.split(' ')[1]);
-    const userID = decodedToken.id;
+    const token = req.headers.authorization.split(' ')[1];
+    const userID = jwt.decode(token).id;
+    const permission = await getUserPermissionFromToken(token);
+    if (!permission.news.C) {
+       return res.status(403).json({ message: 'Недостаточно прав' });
+    }
+
     const { text, title } = req.body;
     const data = {
         created_at: new Date(),
@@ -33,8 +38,16 @@ module.exports.post = async (req, res) => {
 };
 
 module.exports.patch = async (req, res) => {
+    const token = req.headers.authorization.split(' ')[1];
+    const permission = await getUserPermissionFromToken(token);
+    if (!permission.news.U) {
+       return res.status(403).json({ message: 'Недостаточно прав' });
+    }
+
     if (!req.body.title || !req.body.text) {
-        res.status(400).json({ message: 'Заголовок и текст не могут быть пустыми'});
+        res.status(400).json({
+            message: 'Заголовок и текст не могут быть пустыми',
+        });
     }
     const data = req.body;
     const id = req.params.id;
@@ -49,6 +62,12 @@ module.exports.patch = async (req, res) => {
 };
 
 module.exports.delete = async (req, res) => {
+    const token = req.headers.authorization.split(' ')[1];
+    const permission = await getUserPermissionFromToken(token);
+    if (!permission.news.D) {
+       return res.status(403).json({ message: 'Недостаточно прав' });
+    }
+
     try {
         const id = req.params.id;
         await News.destroy({ where: { id } });
@@ -56,7 +75,7 @@ module.exports.delete = async (req, res) => {
         res.status(200).json(news);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Ошибка сервера'});
+        res.status(500).json({ message: 'Ошибка сервера' });
     }
 };
 
@@ -80,4 +99,13 @@ async function getNewsObjects() {
             },
         };
     });
+}
+
+async function getUserPermissionFromToken(token) {
+    const decodedToken = jwt.decode(token);
+    const userID = decodedToken.id;
+    console.log(userID)
+    const user = await User.findOne({ attributes: ['permission'], where: { id: userID } });
+
+    return user.permission;
 }

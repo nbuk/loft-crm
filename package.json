@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon --ignore sessions/ ./bin/www"
+    "start": "nodemon ./bin/www"
   },
   "dependencies": {
     "bcrypt": "^5.0.0",
@@ -13,13 +13,15 @@
     "express": "~4.16.1",
     "formidable": "^1.2.2",
     "http-errors": "~1.6.3",
+    "jimp": "^0.13.0",
     "jsonwebtoken": "^8.5.1",
     "morgan": "~1.9.1",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "pg": "^8.2.1",
     "pg-hstore": "^2.3.3",
-    "sequelize": "^5.21.13"
+    "sequelize": "^5.21.13",
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
     "sequelize-cli": "^5.5.1"

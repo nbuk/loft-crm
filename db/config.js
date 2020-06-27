@@ -1,3 +1,7 @@
+require('dotenv').config({
+  path: '.env',
+});
+
 module.exports = {
   "development": {
     "username": process.env.DB_USER,
@@ -16,6 +20,11 @@ module.exports = {
     "password": process.env.DB_PASS,
     "database": process.env.DB_NAME,
     "host": process.env.DB_HOST,
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "pool": {
+      "max": 10,
+      "min": 0,
+      "idle": 10000
+    }
   }
 }
