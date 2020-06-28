@@ -1,4 +1,5 @@
-const Chat = require('../../db').models.chat;
+const Message = require('../../db').models.message;
+const Sequelize = require('sequelize');
 
 module.exports = (server) => {
     const io = require('socket.io').listen(server);
@@ -64,7 +65,7 @@ async function saveMessage({ recipientId, senderId, text }) {
         text,
     };
     try {
-        await Chat.create(data);
+        await Message.create(data);
     } catch (err) {
         console.error(err);
     }
@@ -72,24 +73,18 @@ async function saveMessage({ recipientId, senderId, text }) {
 
 async function getHistory(payload) {
     const { userId, recipientId } = payload;
-    let rawHistoryData;
-    const messagesFromUser = await Chat.findAll({
-        where: { userId, recipientId },
+
+    const messages = await Message.findAll({
+        where: { 
+            [Sequelize.Op.or]: [
+                { userId, recipientId },
+                { userId: recipientId, recipientId: userId }
+            ]
+         },
+         order: [[ 'id', 'ASC' ]]
     });
     
-    if (userId !== recipientId) {
-        const messagesFromRecipient = await Chat.findAll({
-            where: { userId: recipientId, recipientId: userId },
-        });
-        rawHistoryData = messagesFromUser.concat(messagesFromRecipient);
-    } else {
-        rawHistoryData = messagesFromUser;
-    }
-
-    rawHistoryData.sort((a, b) => {
-        return a.dataValues.id - b.dataValues.id;
-    });
-    const history = rawHistoryData.map(({ dataValues }) => {
+    const history = messages.map(({ dataValues }) => {
         const { recipientId, userId, text } = dataValues;
         return {
             recipientId,

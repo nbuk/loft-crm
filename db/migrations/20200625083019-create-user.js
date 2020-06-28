@@ -29,7 +29,12 @@ module.exports = {
         type: Sequelize.STRING
       },
       permission: {
-        type: Sequelize.JSON
+        type: Sequelize.JSON,
+        defaultValue: {
+          chat: { C: true, R: true, U: true, D: true },
+          news: { C: false, R: true, U: false, D: false },
+          settings: { C: false, R: false, U: false, D: false },
+        }
       },
       createdAt: {
         allowNull: false,

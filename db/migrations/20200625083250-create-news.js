@@ -23,11 +23,12 @@ module.exports = {
       },
       userID: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
           model: 'users',
           key: 'id'
-        }
+        },
+        onDelete: 'SET NULL'
       },
       createdAt: {
         allowNull: false,

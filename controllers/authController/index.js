@@ -39,12 +39,7 @@ module.exports.registration = async (req, res) => {
                 surName,
                 firstName,
                 middleName,
-                password: bcryptPassword,
-                permission: {
-                    chat: { C: true, R: true, U: true, D: true },
-                    news: { C: false, R: true, U: false, D: false },
-                    settings: { C: false, R: false, U: false, D: false },
-                },
+                password: bcryptPassword
             };
             const result = await User.create(data);
             res.status(201).json(getAuthorizedUserObject(result.dataValues));
