@@ -1,6 +1,6 @@
 node_modules
 .env
-
+.envlocal
 .DS_Store
 public/.DS_Store
 public/assets/.DS_Store
