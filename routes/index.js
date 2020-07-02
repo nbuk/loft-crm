@@ -6,15 +6,6 @@ const profileCtrl = require('../controllers/profileController');
 const usersCtrl = require('../controllers/usersController');
 const newsCtrl = require('../controllers/newsController');
 
-router.get(
-    '/secret',
-    passport.authenticate('jwt', { session: false }),
-    (req, res) => {
-        console.log('TEST');
-        res.send('asdasdasdas');
-    },
-);
-
 router.post('/api/registration', authCtrl.registration);
 router.post('/api/login', authCtrl.login);
 router.post(
